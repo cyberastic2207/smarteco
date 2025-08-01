@@ -1,0 +1,1294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSmart Learning Dashboard - Start Your Financial Journey</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .eco-gradient {
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 100%);
+        }
+        
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        
+        .lesson-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .lesson-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .lesson-card.completed {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            border: 2px solid #10b981;
+        }
+        
+        .lesson-card.current {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            border: 2px solid #f59e0b;
+            animation: pulse 2s infinite;
+        }
+        
+        .lesson-card.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .float-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .coin-bounce {
+            animation: coinBounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes coinBounce {
+            0%, 100% { transform: translateY(0px) rotateY(0deg); }
+            50% { transform: translateY(-15px) rotateY(180deg); }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .quiz-option {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .quiz-option:hover {
+            background-color: #f3f4f6;
+            transform: translateX(5px);
+        }
+        
+        .quiz-option.correct {
+            background-color: #d1fae5;
+            border-color: #10b981;
+        }
+        
+        .quiz-option.incorrect {
+            background-color: #fee2e2;
+            border-color: #ef4444;
+        }
+        
+        .achievement-badge {
+            animation: badgeAppear 0.5s ease-out;
+        }
+        
+        @keyframes badgeAppear {
+            0% { transform: scale(0) rotate(180deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <div class="text-2xl coin-bounce">💰</div>
+                <h1 class="text-xl font-bold">EcoSmart Learning</h1>
+            </div>
+            <div class="flex items-center space-x-4">
+                <div class="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
+                    <span class="text-sm">Level:</span>
+                    <span class="font-bold" id="userLevel">1</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-white/20 px-3 py-1 rounded-full">
+                    <span class="text-sm">💰</span>
+                    <span class="font-bold" id="userCoins">0</span>
+                </div>
+                <button onclick="window.history.back()" class="hover:bg-white/20 px-3 py-1 rounded-full transition-colors">
+                    ← Back
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Welcome Section -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-800 mb-4">Welcome to Your Financial Journey! 🚀</h1>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Learn budgeting, saving, and entrepreneurship through fun, interactive lessons designed just for you!
+                </p>
+            </div>
+            
+            <!-- Progress Overview -->
+            <div class="max-w-4xl mx-auto">
+                <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6 rounded-2xl border mb-8">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-xl font-bold text-gray-800">Your Progress</h3>
+                        <span class="text-sm text-gray-600" id="progressText">0% Complete</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-4 mb-4">
+                        <div class="progress-bar bg-gradient-to-r from-green-400 to-blue-500 h-4 rounded-full" style="width: 0%" id="progressBar"></div>
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div>
+                            <div class="text-2xl font-bold text-blue-600" id="lessonsCompleted">0</div>
+                            <div class="text-sm text-gray-600">Lessons Done</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-green-600" id="quizzesCompleted">0</div>
+                            <div class="text-sm text-gray-600">Quizzes Passed</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-purple-600" id="badgesEarned">0</div>
+                            <div class="text-sm text-gray-600">Badges Earned</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold text-orange-600" id="streakDays">0</div>
+                            <div class="text-sm text-gray-600">Day Streak</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Learning Modules -->
+    <section class="py-12 bg-gray-50">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Learning Modules</h2>
+            
+            <div class="max-w-6xl mx-auto grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="lessonsContainer">
+                <!-- Lessons will be dynamically generated here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Achievements Section -->
+    <section class="py-12 bg-white">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center text-gray-800 mb-12">Your Achievements 🏆</h2>
+            
+            <div class="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4" id="achievementsContainer">
+                <!-- Achievements will be dynamically generated here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Lesson Modal -->
+    <div id="lessonModal" class="modal">
+        <div class="bg-white rounded-2xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800" id="modalTitle">Lesson Title</h2>
+                    <button onclick="closeLessonModal()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                </div>
+            </div>
+            <div class="p-6" id="modalContent">
+                <!-- Lesson content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="modal">
+        <div class="bg-white rounded-2xl max-w-2xl w-full mx-4">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Quick Quiz 🧠</h2>
+                    <button onclick="closeQuizModal()" class="text-gray-500 hover:text-gray-700 text-2xl">×</button>
+                </div>
+            </div>
+            <div class="p-6" id="quizContent">
+                <!-- Quiz content will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Learning data structure
+        const lessons = [
+            {
+                id: 1,
+                title: "Money Basics",
+                description: "Learn what money is and why it's important",
+                icon: "💵",
+                difficulty: "Beginner",
+                duration: "10 min",
+                status: "current",
+                content: `
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">💵</div>
+                            <h3 class="text-2xl font-bold mb-4">What is Money?</h3>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">💡 The Story of Money:</h4>
+                            <p class="mb-4">Long ago, people traded things directly - like trading 3 apples for 1 loaf of bread. This was called "bartering." But what if you had apples and wanted shoes, but the shoemaker wanted fish? This was complicated!</p>
+                            <p class="mb-4">So people invented money as a solution. Money is like a universal trading tool that everyone agrees has value.</p>
+                            <ul class="space-y-2">
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span><strong>Medium of Exchange:</strong> Money lets us trade easily without bartering</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span><strong>Store of Value:</strong> Money keeps its worth over time (mostly!)</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500">✓</span>
+                                    <span><strong>Unit of Account:</strong> Money helps us measure and compare prices</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🌍 Types of Money Around the World:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h5 class="font-semibold mb-2">🪙 Physical Money</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Coins (made of metal)</li>
+                                        <li>• Paper bills/notes</li>
+                                        <li>• Different countries have different currencies</li>
+                                        <li>• Examples: Dollars, Euros, Yen, Pounds</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h5 class="font-semibold mb-2">💳 Digital Money</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Bank accounts (numbers on computers)</li>
+                                        <li>• Credit and debit cards</li>
+                                        <li>• Mobile payment apps</li>
+                                        <li>• Online banking</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">💰 How Do People Earn Money?</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <h5 class="font-semibold mb-2 text-green-700">👨‍💼 Adults Usually:</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Work jobs (salary/hourly pay)</li>
+                                        <li>• Own businesses</li>
+                                        <li>• Invest money to make more money</li>
+                                        <li>• Provide services to others</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <h5 class="font-semibold mb-2 text-green-700">🧒 Students Can:</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Do chores for allowance</li>
+                                        <li>• Help neighbors with tasks</li>
+                                        <li>• Sell things they make</li>
+                                        <li>• Get money as gifts</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🎯 Activity: Money Detective!</h4>
+                            <p class="mb-4">Become a money detective! Look around your home and find examples of:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-2xl mb-2">🪙</div>
+                                    <p class="text-sm font-semibold">Physical Money</p>
+                                    <p class="text-xs text-gray-600">Find coins, bills, or piggy banks</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-2xl mb-2">💳</div>
+                                    <p class="text-sm font-semibold">Digital Money</p>
+                                    <p class="text-xs text-gray-600">Credit cards, banking apps, online shopping</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300">
+                                    <div class="text-2xl mb-2">🛒</div>
+                                    <p class="text-sm font-semibold">Money Being Used</p>
+                                    <p class="text-xs text-gray-600">Receipts, bills, shopping lists</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">⚠️ Important Money Facts:</h4>
+                            <ul class="space-y-2">
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500">!</span>
+                                    <span>Money doesn't grow on trees - it must be earned through work or value creation</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500">!</span>
+                                    <span>Money is limited - once you spend it, it's gone (unless you earn more)</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500">!</span>
+                                    <span>Money is a tool, not the goal - it helps us get what we need and want</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button onclick="completeLesson(1)" class="eco-gradient text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition-transform">
+                                Complete Lesson & Take Quiz 🎯
+                            </button>
+                        </div>
+                    </div>
+                `,
+                quiz: [
+                    {
+                        question: "What is the main purpose of money?",
+                        options: [
+                            "To collect and keep in a box",
+                            "To buy things we need and want",
+                            "To show off to friends",
+                            "To make paper airplanes"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "Before money was invented, how did people trade?",
+                        options: [
+                            "They used credit cards",
+                            "They used bartering (trading items directly)",
+                            "They used mobile apps",
+                            "They didn't trade at all"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "Which of these is an example of digital money?",
+                        options: [
+                            "Coins in your pocket",
+                            "Paper bills",
+                            "Money in a bank account",
+                            "Gold jewelry"
+                        ],
+                        correct: 2
+                    },
+                    {
+                        question: "How can students earn money?",
+                        options: [
+                            "Only by asking parents",
+                            "By doing chores and helping others",
+                            "Money appears automatically",
+                            "By playing video games"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 2,
+                title: "Wants vs Needs",
+                description: "Understand the difference between things you want and need",
+                icon: "🤔",
+                difficulty: "Beginner",
+                duration: "15 min",
+                status: "locked",
+                content: `
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">🤔</div>
+                            <h3 class="text-2xl font-bold mb-4">Wants vs Needs</h3>
+                        </div>
+                        
+                        <div class="bg-orange-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🧠 Why This Matters:</h4>
+                            <p class="mb-4">Imagine you have $20. You could spend it all on candy and toys, but then you might not have money for lunch tomorrow! Learning the difference between wants and needs helps you make smart money choices.</p>
+                            <p class="text-sm text-orange-700 font-semibold">💡 Smart spenders take care of needs first, then enjoy wants with leftover money!</p>
+                        </div>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div class="bg-red-50 p-6 rounded-xl border-2 border-red-200">
+                                <h4 class="font-bold text-lg mb-3 text-red-700">🚨 NEEDS (Must Have for Survival)</h4>
+                                <p class="text-sm mb-4 text-red-600">These are things you absolutely cannot live without!</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🏠</span>
+                                        <div>
+                                            <strong>Shelter</strong>
+                                            <p class="text-xs text-gray-600">A safe place to live, protection from weather</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🍎</span>
+                                        <div>
+                                            <strong>Food & Water</strong>
+                                            <p class="text-xs text-gray-600">Nutritious meals and clean drinking water</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">👕</span>
+                                        <div>
+                                            <strong>Basic Clothing</strong>
+                                            <p class="text-xs text-gray-600">Clothes to keep warm and protected</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🏥</span>
+                                        <div>
+                                            <strong>Healthcare</strong>
+                                            <p class="text-xs text-gray-600">Medical care when sick or injured</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">📚</span>
+                                        <div>
+                                            <strong>Education</strong>
+                                            <p class="text-xs text-gray-600">School supplies and learning materials</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="bg-blue-50 p-6 rounded-xl border-2 border-blue-200">
+                                <h4 class="font-bold text-lg mb-3 text-blue-700">💙 WANTS (Nice to Have for Fun)</h4>
+                                <p class="text-sm mb-4 text-blue-600">These make life more enjoyable but aren't necessary for survival!</p>
+                                <ul class="space-y-3">
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🎮</span>
+                                        <div>
+                                            <strong>Video Games</strong>
+                                            <p class="text-xs text-gray-600">Fun entertainment but not essential</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🍕</span>
+                                        <div>
+                                            <strong>Treats & Fast Food</strong>
+                                            <p class="text-xs text-gray-600">Tasty but not needed for nutrition</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">👟</span>
+                                        <div>
+                                            <strong>Designer Items</strong>
+                                            <p class="text-xs text-gray-600">Expensive brands when cheaper works fine</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🎬</span>
+                                        <div>
+                                            <strong>Entertainment</strong>
+                                            <p class="text-xs text-gray-600">Movies, concerts, theme parks</p>
+                                        </div>
+                                    </li>
+                                    <li class="flex items-start space-x-3">
+                                        <span class="text-2xl">🧸</span>
+                                        <div>
+                                            <strong>Extra Toys</strong>
+                                            <p class="text-xs text-gray-600">More toys when you already have some</p>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🤷‍♀️ The Tricky Gray Area:</h4>
+                            <p class="mb-4">Sometimes it's not obvious! The same item can be a need OR a want depending on the situation:</p>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-600 mb-2">📱 Phone Example:</h5>
+                                    <p class="text-sm mb-2"><strong>NEED:</strong> Basic phone for safety and emergencies</p>
+                                    <p class="text-sm"><strong>WANT:</strong> Latest iPhone with all the fancy features</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-600 mb-2">👟 Shoes Example:</h5>
+                                    <p class="text-sm mb-2"><strong>NEED:</strong> Sturdy shoes that fit and protect your feet</p>
+                                    <p class="text-sm"><strong>WANT:</strong> $200 designer sneakers for style</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🎯 The Smart Spending Strategy:</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">1</span>
+                                    <span><strong>List your needs first</strong> - What do you absolutely require?</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">2</span>
+                                    <span><strong>Calculate the cost</strong> - How much do your needs cost?</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-green-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">3</span>
+                                    <span><strong>Pay for needs first</strong> - Always cover these before anything else</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <span class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold">4</span>
+                                    <span><strong>Enjoy wants with leftover money</strong> - Now you can have fun guilt-free!</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🎯 Activity: Want vs Need Sorting Game!</h4>
+                            <p class="mb-4">Look at these items and decide: Is it a NEED or a WANT?</p>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                <div class="bg-white p-3 rounded-lg border text-center">
+                                    <div class="text-2xl mb-1">🥪</div>
+                                    <p class="text-xs">Lunch</p>
+                                    <p class="text-xs text-green-600 font-semibold">NEED</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border text-center">
+                                    <div class="text-2xl mb-1">🍭</div>
+                                    <p class="text-xs">Candy</p>
+                                    <p class="text-xs text-blue-600 font-semibold">WANT</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border text-center">
+                                    <div class="text-2xl mb-1">🧥</div>
+                                    <p class="text-xs">Winter Coat</p>
+                                    <p class="text-xs text-green-600 font-semibold">NEED</p>
+                                </div>
+                                <div class="bg-white p-3 rounded-lg border text-center">
+                                    <div class="text-2xl mb-1">💄</div>
+                                    <p class="text-xs">Makeup</p>
+                                    <p class="text-xs text-blue-600 font-semibold">WANT</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button onclick="completeLesson(2)" class="eco-gradient text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition-transform">
+                                Complete Lesson & Take Quiz 🎯
+                            </button>
+                        </div>
+                    </div>
+                `,
+                quiz: [
+                    {
+                        question: "Which of these is a NEED, not a WANT?",
+                        options: [
+                            "A new video game",
+                            "Designer sneakers",
+                            "Food for dinner",
+                            "A movie ticket"
+                        ],
+                        correct: 2
+                    },
+                    {
+                        question: "What should you do FIRST with your money?",
+                        options: [
+                            "Buy the coolest toys",
+                            "Save it all forever",
+                            "Pay for your needs",
+                            "Give it all away"
+                        ],
+                        correct: 2
+                    },
+                    {
+                        question: "A basic phone for safety is a _____, but the latest iPhone is a _____.",
+                        options: [
+                            "Want, Need",
+                            "Need, Want",
+                            "Want, Want",
+                            "Need, Need"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "Why is it important to know the difference between wants and needs?",
+                        options: [
+                            "To impress your friends",
+                            "To make smart spending decisions",
+                            "To buy more expensive things",
+                            "To never spend money"
+                        ],
+                        correct: 1
+                    }
+                ]
+            },
+            {
+                id: 3,
+                title: "Making a Budget",
+                description: "Learn how to plan your spending with a simple budget",
+                icon: "📊",
+                difficulty: "Intermediate",
+                duration: "20 min",
+                status: "locked",
+                content: `
+                    <div class="space-y-6">
+                        <div class="text-center">
+                            <div class="text-6xl mb-4">📊</div>
+                            <h3 class="text-2xl font-bold mb-4">Creating Your First Budget</h3>
+                        </div>
+                        
+                        <div class="bg-purple-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">💡 What is a Budget?</h4>
+                            <p class="mb-4">Think of a budget like a GPS for your money! Just like GPS helps you get from point A to point B, a budget helps your money get from your pocket to your goals.</p>
+                            <p class="mb-4">A budget is a plan that shows:</p>
+                            <ul class="space-y-2">
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-green-500">💰</span>
+                                    <span><strong>Income:</strong> How much money comes in (allowance, gifts, chores)</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-red-500">💸</span>
+                                    <span><strong>Expenses:</strong> How much money goes out (spending on needs and wants)</span>
+                                </li>
+                                <li class="flex items-start space-x-2">
+                                    <span class="text-blue-500">🏦</span>
+                                    <span><strong>Savings:</strong> How much money you keep for later (goals and emergencies)</span>
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-orange-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🧮 The Budget Equation:</h4>
+                            <div class="text-center bg-white p-4 rounded-lg border-2 border-orange-200">
+                                <p class="text-2xl font-bold text-gray-800 mb-2">Income = Expenses + Savings</p>
+                                <p class="text-sm text-gray-600">Money Coming In = Money Going Out + Money Saved</p>
+                            </div>
+                            <p class="mt-4 text-sm text-orange-700">💡 If your expenses are more than your income, you need to spend less or earn more!</p>
+                        </div>
+                        
+                        <div class="bg-white p-6 rounded-xl border-2 border-gray-200">
+                            <h4 class="font-bold text-lg mb-4">🎯 Sample Teen Budget Breakdown:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                <div class="bg-green-100 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-700 mb-2">💰 Income: $50/month</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Weekly allowance: $30</li>
+                                        <li>• Extra chores: $15</li>
+                                        <li>• Birthday money: $5</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-red-100 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-red-700 mb-2">💸 Expenses: $30/month</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Snacks & treats: $15</li>
+                                        <li>• Movies/games: $10</li>
+                                        <li>• School supplies: $5</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-blue-100 p-4 rounded-lg">
+                                    <h5 class="font-semibold text-blue-700 mb-2">🏦 Savings: $20/month</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Emergency fund: $10</li>
+                                        <li>• New bike goal: $10</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="bg-gray-50 p-3 rounded-lg text-center">
+                                <p class="text-sm"><strong>Check:</strong> $50 (income) = $30 (expenses) + $20 (savings) ✅</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-teal-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">📝 How to Create Your Budget (Step by Step):</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-teal-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">1</span>
+                                    <div>
+                                        <strong>Track Your Money for 1 Week</strong>
+                                        <p class="text-sm text-gray-600">Write down every dollar you get and spend. Use a notebook or phone app!</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-teal-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">2</span>
+                                    <div>
+                                        <strong>Calculate Your Monthly Income</strong>
+                                        <p class="text-sm text-gray-600">Add up allowance, chore money, gifts, and any other money you receive</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-teal-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">3</span>
+                                    <div>
+                                        <strong>List Your Needs First</strong>
+                                        <p class="text-sm text-gray-600">School supplies, lunch money, transportation - the must-haves</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-teal-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">4</span>
+                                    <div>
+                                        <strong>Plan Your Savings</strong>
+                                        <p class="text-sm text-gray-600">Decide how much to save for goals and emergencies (aim for 20-40%)</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start space-x-3">
+                                    <span class="bg-teal-500 text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">5</span>
+                                    <div>
+                                        <strong>Budget for Wants</strong>
+                                        <p class="text-sm text-gray-600">Use leftover money for fun stuff like games, treats, and entertainment</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-yellow-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">✨ Budget Success Tips:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <ul class="space-y-2">
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-yellow-500">⭐</span>
+                                        <span><strong>Use the 50/30/20 rule:</strong> 50% needs, 30% wants, 20% savings</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-yellow-500">⭐</span>
+                                        <span><strong>Review weekly:</strong> Check if you're sticking to your plan</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-yellow-500">⭐</span>
+                                        <span><strong>Be realistic:</strong> Don't make it too strict or you'll give up</span>
+                                    </li>
+                                </ul>
+                                <ul class="space-y-2">
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-yellow-500">⭐</span>
+                                        <span><strong>Use envelopes:</strong> Put cash in labeled envelopes for each category</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-yellow-500">⭐</span>
+                                        <span><strong>Plan for fun:</strong> Always include money for things you enjoy</span>
+                                    </li>
+                                    <li class="flex items-start space-x-2">
+                                        <span class="text-yellow-500">⭐</span>
+                                        <span><strong>Adjust as needed:</strong> Your budget should change as your life changes</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🚨 Common Budget Mistakes to Avoid:</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h5 class="font-semibold text-red-600 mb-2">❌ Don't Do This:</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Forgetting small purchases</li>
+                                        <li>• Not tracking your spending</li>
+                                        <li>• Making it too complicated</li>
+                                        <li>• Forgetting to save anything</li>
+                                    </ul>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg">
+                                    <h5 class="font-semibold text-green-600 mb-2">✅ Do This Instead:</h5>
+                                    <ul class="text-sm space-y-1">
+                                        <li>• Write down every purchase</li>
+                                        <li>• Check your budget weekly</li>
+                                        <li>• Keep it simple and clear</li>
+                                        <li>• Save first, spend second</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-6 rounded-xl">
+                            <h4 class="font-bold text-lg mb-3">🎯 Try This: Create Your Own Mini-Budget!</h4>
+                            <p class="mb-4">Let's practice! Imagine you have $25 this month. How would you budget it?</p>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="bg-white p-4 rounded-lg border-2 border-dashed border-green-300">
+                                    <h5 class="font-semibold text-green-600 mb-2">💰 Your Income: $25</h5>
+                                    <p class="text-xs text-gray-600">This is what you have to work with</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg border-2 border-dashed border-red-300">
+                                    <h5 class="font-semibold text-red-600 mb-2">💸 Your Expenses: $___</h5>
+                                    <p class="text-xs text-gray-600">Needs + wants (should be less than $25)</p>
+                                </div>
+                                <div class="bg-white p-4 rounded-lg border-2 border-dashed border-blue-300">
+                                    <h5 class="font-semibold text-blue-600 mb-2">🏦 Your Savings: $___</h5>
+                                    <p class="text-xs text-gray-600">Aim for at least $5 (20%)</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button onclick="completeLesson(3)" class="eco-gradient text-white px-8 py-3 rounded-full font-semibold hover:scale-105 transition-transform">
+                                Complete Lesson & Take Quiz 🎯
+                            </button>
+                        </div>
+                    </div>
+                `,
+                quiz: [
+                    {
+                        question: "In a budget, what should you do FIRST?",
+                        options: [
+                            "Plan your spending on wants",
+                            "Figure out how much money you have",
+                            "Buy something expensive",
+                            "Give money to friends"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "What is the budget equation?",
+                        options: [
+                            "Income = Expenses - Savings",
+                            "Income = Expenses + Savings",
+                            "Expenses = Income + Savings",
+                            "Savings = Income - Expenses"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "In the 50/30/20 budget rule, what does the 20% represent?",
+                        options: [
+                            "Needs",
+                            "Wants", 
+                            "Savings",
+                            "Gifts"
+                        ],
+                        correct: 2
+                    },
+                    {
+                        question: "Why should you track your spending for a week before making a budget?",
+                        options: [
+                            "To impress your parents",
+                            "To see where your money actually goes",
+                            "To make it more complicated",
+                            "To spend more money"
+                        ],
+                        correct: 1
+                    },
+                    {
+                        question: "If you have $30 income and $25 expenses, how much can you save?",
+                        options: [
+                            "$55",
+                            "$25",
+                            "$5",
+                            "$30"
+                        ],
+                        correct: 2
+                    }
+                ]
+            },
+            {
+                id: 4,
+                title: "Smart Saving",
+                description: "Discover the power of saving money for your goals",
+                icon: "🏦",
+                difficulty: "Intermediate",
+                duration: "18 min",
+                status: "locked"
+            },
+            {
+                id: 5,
+                title: "Earning Money",
+                description: "Learn different ways to earn money as a student",
+                icon: "💼",
+                difficulty: "Intermediate",
+                duration: "25 min",
+                status: "locked"
+            },
+            {
+                id: 6,
+                title: "Starting a Business",
+                description: "Basic entrepreneurship and business planning",
+                icon: "🚀",
+                difficulty: "Advanced",
+                duration: "30 min",
+                status: "locked"
+            }
+        ];
+
+        const achievements = [
+            { id: 1, name: "First Steps", description: "Complete your first lesson", icon: "🎯", earned: false },
+            { id: 2, name: "Quiz Master", description: "Pass 3 quizzes in a row", icon: "🧠", earned: false },
+            { id: 3, name: "Budget Pro", description: "Complete budgeting lessons", icon: "📊", earned: false },
+            { id: 4, name: "Saver", description: "Learn about saving money", icon: "🏦", earned: false },
+            { id: 5, name: "Entrepreneur", description: "Complete business lessons", icon: "🚀", earned: false },
+            { id: 6, name: "Streak Champion", description: "Learn for 7 days straight", icon: "🔥", earned: false },
+            { id: 7, name: "Money Master", description: "Complete all lessons", icon: "👑", earned: false },
+            { id: 8, name: "Helper", description: "Share knowledge with others", icon: "🤝", earned: false }
+        ];
+
+        // User progress data
+        let userProgress = {
+            level: 1,
+            coins: 0,
+            completedLessons: [],
+            completedQuizzes: [],
+            streak: 0,
+            earnedAchievements: []
+        };
+
+        // Load user progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('ecosmart_progress');
+            if (saved) {
+                userProgress = { ...userProgress, ...JSON.parse(saved) };
+            }
+            updateProgressDisplay();
+        }
+
+        // Save user progress to localStorage
+        function saveProgress() {
+            localStorage.setItem('ecosmart_progress', JSON.stringify(userProgress));
+        }
+
+        // Update progress display
+        function updateProgressDisplay() {
+            document.getElementById('userLevel').textContent = userProgress.level;
+            document.getElementById('userCoins').textContent = userProgress.coins;
+            document.getElementById('lessonsCompleted').textContent = userProgress.completedLessons.length;
+            document.getElementById('quizzesCompleted').textContent = userProgress.completedQuizzes.length;
+            document.getElementById('badgesEarned').textContent = userProgress.earnedAchievements.length;
+            document.getElementById('streakDays').textContent = userProgress.streak;
+            
+            const progressPercent = Math.round((userProgress.completedLessons.length / lessons.length) * 100);
+            document.getElementById('progressBar').style.width = progressPercent + '%';
+            document.getElementById('progressText').textContent = progressPercent + '% Complete';
+        }
+
+        // Render lessons
+        function renderLessons() {
+            const container = document.getElementById('lessonsContainer');
+            container.innerHTML = '';
+            
+            lessons.forEach((lesson, index) => {
+                let status = 'locked';
+                if (index === 0) status = 'current';
+                if (userProgress.completedLessons.includes(lesson.id)) status = 'completed';
+                if (index > 0 && userProgress.completedLessons.includes(lessons[index - 1].id)) status = 'current';
+                
+                const lessonCard = document.createElement('div');
+                lessonCard.className = `lesson-card bg-white p-6 rounded-2xl shadow-lg border-2 ${status}`;
+                lessonCard.innerHTML = `
+                    <div class="text-center mb-4">
+                        <div class="text-4xl mb-2 ${status === 'locked' ? 'grayscale' : ''}">${lesson.icon}</div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">${lesson.title}</h3>
+                        <p class="text-gray-600 text-sm mb-3">${lesson.description}</p>
+                        <div class="flex justify-center space-x-4 text-xs text-gray-500">
+                            <span class="bg-gray-100 px-2 py-1 rounded-full">${lesson.difficulty}</span>
+                            <span class="bg-gray-100 px-2 py-1 rounded-full">${lesson.duration}</span>
+                        </div>
+                    </div>
+                    <div class="text-center">
+                        ${status === 'completed' ? 
+                            '<div class="text-green-600 font-semibold">✅ Completed</div>' :
+                            status === 'current' ?
+                            '<button onclick="openLesson(' + lesson.id + ')" class="eco-gradient text-white px-6 py-2 rounded-full font-semibold hover:scale-105 transition-transform">Start Learning</button>' :
+                            '<div class="text-gray-400">🔒 Locked</div>'
+                        }
+                    </div>
+                `;
+                
+                if (status !== 'locked') {
+                    lessonCard.addEventListener('click', () => openLesson(lesson.id));
+                }
+                
+                container.appendChild(lessonCard);
+            });
+        }
+
+        // Render achievements
+        function renderAchievements() {
+            const container = document.getElementById('achievementsContainer');
+            container.innerHTML = '';
+            
+            achievements.forEach(achievement => {
+                const earned = userProgress.earnedAchievements.includes(achievement.id);
+                const achievementCard = document.createElement('div');
+                achievementCard.className = `text-center p-4 rounded-xl border-2 ${earned ? 'bg-yellow-50 border-yellow-300' : 'bg-gray-50 border-gray-200'}`;
+                achievementCard.innerHTML = `
+                    <div class="text-3xl mb-2 ${earned ? '' : 'grayscale opacity-50'}">${achievement.icon}</div>
+                    <h4 class="font-semibold text-sm mb-1 ${earned ? 'text-yellow-700' : 'text-gray-500'}">${achievement.name}</h4>
+                    <p class="text-xs ${earned ? 'text-yellow-600' : 'text-gray-400'}">${achievement.description}</p>
+                    ${earned ? '<div class="text-xs text-yellow-600 mt-1">✅ Earned!</div>' : ''}
+                `;
+                container.appendChild(achievementCard);
+            });
+        }
+
+        // Open lesson modal
+        function openLesson(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson || !lesson.content) return;
+            
+            document.getElementById('modalTitle').textContent = lesson.title;
+            document.getElementById('modalContent').innerHTML = lesson.content;
+            document.getElementById('lessonModal').classList.add('active');
+        }
+
+        // Close lesson modal
+        function closeLessonModal() {
+            document.getElementById('lessonModal').classList.remove('active');
+        }
+
+        // Complete lesson
+        function completeLesson(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson.quiz) return;
+            
+            closeLessonModal();
+            openQuiz(lessonId);
+        }
+
+        // Quiz state
+        let currentQuiz = null;
+        let currentQuestionIndex = 0;
+        let quizScore = 0;
+
+        // Open quiz modal
+        function openQuiz(lessonId) {
+            const lesson = lessons.find(l => l.id === lessonId);
+            if (!lesson.quiz) return;
+            
+            currentQuiz = lesson.quiz;
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            
+            showQuizQuestion(lessonId);
+            document.getElementById('quizModal').classList.add('active');
+        }
+
+        // Show current quiz question
+        function showQuizQuestion(lessonId) {
+            const question = currentQuiz[currentQuestionIndex];
+            const quizContent = document.getElementById('quizContent');
+            
+            quizContent.innerHTML = `
+                <div class="space-y-6">
+                    <div class="text-center">
+                        <div class="mb-2">
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">
+                                Question ${currentQuestionIndex + 1} of ${currentQuiz.length}
+                            </span>
+                        </div>
+                        <h3 class="text-xl font-bold mb-4">${question.question}</h3>
+                    </div>
+                    <div class="space-y-3">
+                        ${question.options.map((option, index) => `
+                            <div class="quiz-option p-4 border-2 border-gray-200 rounded-xl" onclick="selectAnswer(${index}, ${question.correct}, ${lessonId})">
+                                <span class="font-semibold">${String.fromCharCode(65 + index)}.</span> ${option}
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Close quiz modal
+        function closeQuizModal() {
+            document.getElementById('quizModal').classList.remove('active');
+        }
+
+        // Select quiz answer
+        function selectAnswer(selected, correct, lessonId) {
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((option, index) => {
+                if (index === correct) {
+                    option.classList.add('correct');
+                } else if (index === selected && selected !== correct) {
+                    option.classList.add('incorrect');
+                }
+                option.style.pointerEvents = 'none';
+            });
+            
+            // Track score
+            if (selected === correct) {
+                quizScore++;
+            }
+            
+            setTimeout(() => {
+                currentQuestionIndex++;
+                
+                if (currentQuestionIndex < currentQuiz.length) {
+                    // More questions remaining
+                    showQuizQuestion(lessonId);
+                } else {
+                    // Quiz completed
+                    showQuizResults(lessonId);
+                }
+            }, 1500);
+        }
+
+        // Show quiz results
+        function showQuizResults(lessonId) {
+            const percentage = Math.round((quizScore / currentQuiz.length) * 100);
+            const passed = percentage >= 70;
+            
+            const quizContent = document.getElementById('quizContent');
+            quizContent.innerHTML = `
+                <div class="text-center space-y-6">
+                    <div class="text-6xl mb-4">${passed ? '🎉' : '📚'}</div>
+                    <h3 class="text-2xl font-bold">${passed ? 'Congratulations!' : 'Keep Learning!'}</h3>
+                    <div class="bg-gray-50 p-6 rounded-xl">
+                        <div class="text-3xl font-bold mb-2 ${passed ? 'text-green-600' : 'text-orange-600'}">
+                            ${quizScore}/${currentQuiz.length} Correct
+                        </div>
+                        <div class="text-lg ${passed ? 'text-green-600' : 'text-orange-600'}">
+                            ${percentage}% Score
+                        </div>
+                    </div>
+                    
+                    ${passed ? `
+                        <div class="bg-green-50 p-4 rounded-xl">
+                            <p class="text-green-700 font-semibold">✅ Lesson Complete!</p>
+                            <p class="text-sm text-green-600">You earned ${quizScore * 5} coins! 💰</p>
+                        </div>
+                    ` : `
+                        <div class="bg-orange-50 p-4 rounded-xl">
+                            <p class="text-orange-700 font-semibold">📖 Review the lesson and try again!</p>
+                            <p class="text-sm text-orange-600">You need 70% to pass (${Math.ceil(currentQuiz.length * 0.7)} correct answers)</p>
+                        </div>
+                    `}
+                    
+                    <div class="flex gap-4 justify-center">
+                        ${passed ? '' : `
+                            <button onclick="retakeQuiz(${lessonId})" class="bg-orange-500 text-white px-6 py-2 rounded-full hover:bg-orange-600 transition-colors">
+                                📚 Review & Retake
+                            </button>
+                        `}
+                        <button onclick="closeQuizModal()" class="eco-gradient text-white px-6 py-2 rounded-full hover:scale-105 transition-transform">
+                            ${passed ? '🎯 Continue Learning' : '👍 Got It'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            if (passed) {
+                // Mark lesson as completed
+                if (!userProgress.completedLessons.includes(lessonId)) {
+                    userProgress.completedLessons.push(lessonId);
+                    userProgress.coins += 10;
+                    checkAchievements();
+                }
+                if (!userProgress.completedQuizzes.includes(lessonId)) {
+                    userProgress.completedQuizzes.push(lessonId);
+                    userProgress.coins += quizScore * 5;
+                }
+                
+                saveProgress();
+                updateProgressDisplay();
+                renderLessons();
+            }
+        }
+
+        // Retake quiz
+        function retakeQuiz(lessonId) {
+            currentQuestionIndex = 0;
+            quizScore = 0;
+            showQuizQuestion(lessonId);
+        }
+
+        // Check for new achievements
+        function checkAchievements() {
+            // First Steps achievement
+            if (userProgress.completedLessons.length >= 1 && !userProgress.earnedAchievements.includes(1)) {
+                earnAchievement(1);
+            }
+            
+            // Quiz Master achievement
+            if (userProgress.completedQuizzes.length >= 3 && !userProgress.earnedAchievements.includes(2)) {
+                earnAchievement(2);
+            }
+            
+            // Money Master achievement
+            if (userProgress.completedLessons.length === lessons.length && !userProgress.earnedAchievements.includes(7)) {
+                earnAchievement(7);
+            }
+        }
+
+        // Earn achievement
+        function earnAchievement(achievementId) {
+            userProgress.earnedAchievements.push(achievementId);
+            userProgress.coins += 25;
+            
+            const achievement = achievements.find(a => a.id === achievementId);
+            showAchievementNotification(achievement);
+            renderAchievements();
+        }
+
+        // Show achievement notification
+        function showAchievementNotification(achievement) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-yellow-400 text-yellow-900 p-4 rounded-xl shadow-lg z-50 achievement-badge';
+            notification.innerHTML = `
+                <div class="flex items-center space-x-3">
+                    <div class="text-2xl">${achievement.icon}</div>
+                    <div>
+                        <div class="font-bold">Achievement Unlocked!</div>
+                        <div class="text-sm">${achievement.name}</div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+
+        // Show success message
+        function showSuccessMessage(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-green-500 text-white p-4 rounded-xl shadow-lg z-50';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Show error message
+        function showErrorMessage(message) {
+            const notification = document.createElement('div');
+            notification.className = 'fixed top-20 right-4 bg-red-500 text-white p-4 rounded-xl shadow-lg z-50';
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            renderLessons();
+            renderAchievements();
+        });
+
+        // Close modals when clicking outside
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                closeLessonModal();
+                closeQuizModal();
+            }
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'963ba9ed711ecd03',t:'MTc1MzI3ODgwNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
